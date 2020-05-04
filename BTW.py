@@ -142,6 +142,21 @@ def invert_BTW(index, lastCol):
 
     return word
 
+def RLE(word):
+    """optionnel"""
+    ...
+def invert_RLE(word):
+    """optionnel"""
+    ...
+def MTF(word):
+    ...
+def invert_MTF(word):
+    ...
+def huffman(word):
+    ...
+def invert_huffman(word):
+    ...
+
 if __name__ == "__main__":
     from sys import argv
     mot = argv[1]
