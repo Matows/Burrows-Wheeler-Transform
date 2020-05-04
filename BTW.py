@@ -1,3 +1,4 @@
+#!/bin/env python3
 # s par référence
 class Rotation:
     """
@@ -100,17 +101,6 @@ def invert_BTW(index, lastCol):
 
     lastColSorted = sorted(lastCol)
 
-    #(1) a -> nb(a), b -> nb(a) + nb(b)
-    #(2) a -> 0, b -> nb(a), c -> nb(a) + nb(b)
-    precedingChars = {} # char -> nombre total d'instance (dans L ou F?) de caractères précédent le caractère _char_ dans l'alphabet. Dictionnaire ordoné ?
-        # (1) char -> cb de fois il apparait.
-        # (2) sort. 
-    for i in range(len(lastColSorted)-1):
-        if lastColSorted[i] != lastColSorted[i+1]:
-            precedingChars[lastColSorted[i]] = i
-    precedingChars[lastColSorted[-1]] = len(lastColSorted) # dernière lettre
-
-    del lastColSorted
 
     P = [] # i -> Nombre d'instances du caracère lastCol[i] dans le préfix lastCol[:i] (L[0,...,i-1])
     freq = {}
@@ -120,6 +110,12 @@ def invert_BTW(index, lastCol):
         freqChar = freq.get(char, 0)
         P.append(freqChar)
         freq[char] = freqChar+1
+
+    precedingChars = {}
+    tmp = 0
+    for c in sorted(freq.keys()):
+        precedingChars[c] = tmp      # ou permuter les deux lignes, à vérifier
+        tmp += freq[c]
 
     del freq
 
@@ -147,4 +143,6 @@ def invert_BTW(index, lastCol):
     return word
 
 if __name__ == "__main__":
-    print(invert_BTW(*BTW("abcdef")))
+    from sys import argv
+    mot = argv[1]
+    print(invert_BTW(*BTW(mot)))
