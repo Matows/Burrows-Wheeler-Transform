@@ -1,34 +1,41 @@
 #!/bin/env python3
-# s par référence
+from collections import Counter
 class Rotation:
     """
         Provide convenient operations on rotated iterables.
         `Rotation(s, i)` represent something like `s[i:]`
     """
+
+
     def __init__(self, string, index):
         """string : methode getitem et lt
-            string : iterable object
+            string : iterable object passed as reference, implementing standard operators (>,<, ==...)
             index : index of first value
         """
 
         self.string = string
         self.index = index
-        #self._vector = list(range(len(string)))
+
 
     def __str__(self):
         return str(self.string[self.index:] + self.string[:self.index])
 
+
     def __repr__(self):
         return 'Rot(' + str(self.string[self.index:] + self.string[:self.index]) + ')'
+
 
     def __getitem__(self, index):
         return self.string[(self.index + index)%len(self.string)]
 
+
     def __len__(self):
         return len(self.string) - self.index
 
+
     def __eq__(self, other):
         return self.string == other.string and self.index == other.index
+
 
     def __lt__(self, other):
         """ Lower Than `<` operator 
@@ -42,6 +49,7 @@ class Rotation:
                return False
         return len(self) < len(other)
 
+
     def __le__(self, other):
         """ Lower Than `<=` operator 
             usage : Rotation(s, index2) <= Rotation (s, index2)
@@ -51,6 +59,7 @@ class Rotation:
            return True
         else:
            return False
+
 
     def __gt__(self, other):
         """ Lower Than `>` operator 
@@ -64,6 +73,7 @@ class Rotation:
                return False
         return False
 
+
     def __ge__(self, other):
         """ Lower Than `>=` operator 
             usage : Rotation(s, index2) >= Rotation (s, index2)
@@ -74,21 +84,31 @@ class Rotation:
         else:
            return False
 
+
 def lastCol(rotation_table):
+    """Renvoie la dernière colonne d'une matrice sous la forme List<List>"""
     return [rotation[-1] for rotation in rotation_table]
 
+
 def BTW(iterable):
+    """Effectue la transformé de Burrows-Wheeler sur un iterable avec la classe Rotation"""
+    # On crée une liste des rotations
     rotation_table = list(map(lambda i: Rotation(iterable, i), range(len(iterable))))
+    # On la trie
     rotation_table = sorted(rotation_table)
     index = None
+    # On cherche l'indice de la chaine de départ
     for i, rotation in enumerate(rotation_table):
         if rotation.index == 0:
             index = i
             break
     return index, lastCol(rotation_table)
 
+
 def invert_BTW(index, lastCol):
-    """ Notation from official PDF :
+    """ Effectue l'inverse de la transformé de Burrows-Wheeler.
+
+        Notation from official PDF :
         lastCol = L
         len(lastCol) = N
         index = I
@@ -96,16 +116,14 @@ def invert_BTW(index, lastCol):
         precedingChars = C, même taille que alphabet
         P = P, même taille que la colonne
     """
-    # (D1) sort last column
-    # (D2) T est une liste (vecteur math) qui à un numéro de ligne de la matrice M associe une ligne de la matrice M'
+    # On cherche à construire T, est une liste qui à un numéro de ligne de la matrice M associe une ligne de la matrice M' (étant une matrice dont chaque ligne à été décalé de 1)
 
-    lastColSorted = sorted(lastCol)
-
+    lastColSorted = sorted(lastCol) # UNUSED
 
     P = [] # i -> Nombre d'instances du caracère lastCol[i] dans le préfix lastCol[:i] (L[0,...,i-1])
     freq = {}
     # a en position 7 dans L -> a=0 dans P
-    # aabc; 0 1 0 0
+    # aabc -> 0 1 0 0
     for i, char in enumerate(lastCol):
         freqChar = freq.get(char, 0)
         P.append(freqChar)
@@ -114,7 +132,7 @@ def invert_BTW(index, lastCol):
     precedingChars = {}
     tmp = 0
     for c in sorted(freq.keys()):
-        precedingChars[c] = tmp      # ou permuter les deux lignes, à vérifier
+        precedingChars[c] = tmp
         tmp += freq[c]
 
     del freq
@@ -126,34 +144,69 @@ def invert_BTW(index, lastCol):
     del precedingChars, P
 
     word = []
+    # Explication notation :
     # T^2 = T[T[I]
     # T^3 = T[T^2[I] = T[T[T[I]
     tmp = index
     for i in range(len(lastCol)):
-        try:
-            word.append(lastCol[tmp])
-            tmp = T[tmp]
-        except IndexError:
-            print(tmp, lastCol)
-            break
+        word.append(lastCol[tmp])
+        tmp = T[tmp]
 
     word.reverse()
     word = "".join(word)
 
     return word
 
+
 def RLE(word):
     """optionnel"""
     ...
+
 def invert_RLE(word):
     """optionnel"""
     ...
+
 def MTF(word):
     ...
+
 def invert_MTF(word):
     ...
-def huffman(word):
-    ...
+
+### HUFFMAN
+def huffman_tree(texte):
+    """Renvoie l'arbre des lettres utilisé dans le texte, suivant l'encoding de Huffman"""
+
+    def minimum(freq):
+        """Renvoie la plus petite valeur de `freq` suivant sont indice (occurences) et la supprime de `freq`"""
+        mini = min(freq, key = lambda i: i[0])
+        freq.remove(mini)
+        return mini
+
+    freq = [(occurence, letter) for letter, occurence in Counter(texte).items()]
+
+    while len(freq) > 1:
+        left_indice, left_element = minimum(freq)
+        right_indice, right_element = minimum(freq)
+        freq.append(  (left_indice + right_indice, (left_element, right_element) )  )
+
+    #(('A', 'V'), ('O', ('B', 'R'))) pour BRAVO.
+    return freq[0][1]
+
+
+def huffman_dictionnary(tree, prefix='', dictionnary={}):
+    """Renvoie un dictionnaire des correspondance lettre -> code"""
+    # TODO: Corriger le bug qui renvoie le dictionnaire précédent
+    # TEMP FIX : call huffman_dictionnary(tree, '', {})
+    if isinstance(tree, tuple):
+        one = huffman_dictionnary(tree[0], prefix + '0', dictionnary)
+        two = huffman_dictionnary(tree[1], prefix + '1', dictionnary)
+        dictionnary.update(one)
+        dictionnary.update(two)
+    else:
+        dictionnary[tree] = prefix
+    return dictionnary
+### END HUFFMAN
+
 def invert_huffman(word):
     ...
 
