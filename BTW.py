@@ -173,7 +173,7 @@ def invert_MTF(word):
     ...
 
 ### HUFFMAN
-def huffman_tree(texte):
+def huffman_tree(text):
     """Renvoie l'arbre des lettres utilisé dans le texte, suivant l'encoding de Huffman"""
 
     def minimum(freq):
@@ -182,7 +182,7 @@ def huffman_tree(texte):
         freq.remove(mini)
         return mini
 
-    freq = [(occurence, letter) for letter, occurence in Counter(texte).items()]
+    freq = [(occurence, letter) for letter, occurence in Counter(text).items()]
 
     while len(freq) > 1:
         left_indice, left_element = minimum(freq)
@@ -205,6 +205,13 @@ def huffman_dictionnary(tree, prefix='', dictionnary={}):
     else:
         dictionnary[tree] = prefix
     return dictionnary
+
+
+def huffman_encode(text):
+    ...
+
+def huffman_decode(dictionnary, binary_text):
+    ...
 ### END HUFFMAN
 
 def invert_huffman(word):
