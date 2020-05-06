@@ -112,13 +112,10 @@ def invert_BTW(index, lastCol):
         lastCol = L
         len(lastCol) = N
         index = I
-        lastColSorted = F
         precedingChars = C, même taille que alphabet
         P = P, même taille que la colonne
     """
     # On cherche à construire T, est une liste qui à un numéro de ligne de la matrice M associe une ligne de la matrice M' (étant une matrice dont chaque ligne à été décalé de 1)
-
-    lastColSorted = sorted(lastCol) # UNUSED
 
     P = [] # i -> Nombre d'instances du caracère lastCol[i] dans le préfix lastCol[:i] (L[0,...,i-1])
     freq = {}
@@ -189,7 +186,6 @@ def huffman_tree(text):
         right_indice, right_element = minimum(freq)
         freq.append(  (left_indice + right_indice, (left_element, right_element) )  )
 
-    #(('A', 'V'), ('O', ('B', 'R'))) pour BRAVO.
     return freq[0][1]
 
 
@@ -208,11 +204,34 @@ def huffman_dictionnary(tree, prefix='', dictionnary={}):
 
 
 def huffman_encode(text):
-    ...
+    dico = huffman_dictionnary(huffman_tree(text), '', {})
+    #[print(f"'{letter}' -> {code}") for letter,code in dico.items()]
+    #print(text)
+    msg = [dico[letter] for letter in text]
+    #print("|".join(msg))
+    return dico, "".join(msg)
 
 def huffman_decode(dictionnary, binary_text):
-    ...
+    dico_invert = {value:key for key,value in dictionnary.items()}
+
+    msg = []
+    i_start = 0
+
+    for i_end in range(1,len(binary_text)+1):
+
+        # On récupère un bit de plus à chaque fois
+        code_current = binary_text[i_start:i_end]
+        lettre = dico_invert.get(code_current, '')
+
+        if lettre != '':
+            msg.append(lettre)
+            # On ignore la lettre que l'on vient de trouver
+            i_start = i_end
+
+    return "".join(msg)
+
 ### END HUFFMAN
+
 
 def invert_huffman(word):
     ...
