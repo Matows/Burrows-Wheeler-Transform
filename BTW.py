@@ -232,10 +232,6 @@ def huffman_decode(dictionnary, binary_text):
 
 ### END HUFFMAN
 
-
-def invert_huffman(word):
-    ...
-
 if __name__ == "__main__":
     from sys import argv
     mot = argv[1]
