@@ -163,11 +163,27 @@ def invert_RLE(word):
     """optionnel"""
     ...
 
-def MTF(word):
-    ...
+def MTF(word, alphabet):
+    #alphabet = sorted(list(Counter(word)))
+    alphabet = list(alphabet)
+    resultat = []
+    for char in word:
+        i = alphabet.index(char)
+        resultat.append(alphabet[i])
+        alphabet.remove(char)
+        alphabet.insert(0, char)
+    return resultat
 
 def invert_MTF(word):
-    ...
+    alphabet = list(alphabet)
+    resultat = []
+    for i in word:
+        k = alphabet.index(bytes([i]))
+        char = alphabet[k]
+        alphabet.remove(char)
+        alphabet.insert(0, char)
+        resultat.append(char)
+    return resultat
 
 ### HUFFMAN
 def huffman_tree(text):
